@@ -1,79 +1,156 @@
 <% layout("/layouts/boilerplate") %>
 
 <style>
- #filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    
-}
-
-    .filter {
-    text-align: center;
-    margin-right: 2rem;
-    margin-top: 2rem;
-    opacity: 0.7;
-    
-}
-
-   .filter:hover {
-    opacity: 1;
-    cursor: pointer;
-}
-    
-    .filter p {
-    font-size: 0.8rem;
+    #filters-wrap {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
     }
 
-    .tax-info {
-    display: none;
-}
+    /* chips ka scroll area. Arrows isi ke upar float karte hain, isliye width kabhi nahi badalti */
+    .filters-scroller {
+        position: relative;
+        flex: 1 1 0;
+        min-width: 0;            /* bina iske row bahar faile jati hai */
+    }
 
-   .tax-toggle {
-    border: 1px solid black;
-    border-radius: 1rem;
-    height: 3.25rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    margin-left: 2rem;
-    display: flex;
-    align-items: center;
-}
+    #filters {
+        position: relative;      /* JS ke offsetLeft ke liye zaroori */
+        display: flex;
+        overflow-x: auto;
+        scrollbar-width: none;   /* Firefox */
+    }
+    #filters::-webkit-scrollbar { display: none; }   /* Chrome / Safari */
 
-a.filter { 
-    text-decoration: none;
-     color: inherit;
-     }
-.filter.active { 
-      opacity: 1;
-     border-bottom: 2px solid #222;
-     }
+    .filter {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.5rem 0.9rem 0.45rem;
+        color: inherit;
+        text-decoration: none;
+        opacity: 0.6;
+        border-bottom: 2px solid transparent;
+        transition: opacity 0.15s ease, border-color 0.15s ease;
+    }
+    .filter i { font-size: 1.25rem; }
+    .filter p { margin: 0; font-size: 0.8rem; white-space: nowrap; }
+    .filter:hover { opacity: 1; color: inherit; border-bottom-color: #ddd; }
+    .filter.active { opacity: 1; border-bottom-color: #222; }
 
+    /* keyboard se Tab karne par focus dikhe */
+    .filter:focus-visible,
+    .filters-arrow:focus-visible {
+        outline: 2px solid #222;
+        outline-offset: -2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .filter,
+        .filters-scroller::before,
+        .filters-scroller::after { transition: none; }
+    }
+
+    /* left / right arrows (sirf desktop par) */
+    .filters-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        background: #fff;
+        color: #222;
+        font-size: 0.75rem;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    }
+    .filters-arrow-prev { left: 0; }
+    .filters-arrow-next { right: 0; }
+    .filters-arrow:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
+    .filters-arrow[hidden] { display: none; }
+
+    /* kinaare par halka fade, taaki aadhi kati chip na dikhe (sirf desktop par) */
+    @media (min-width: 768px) {
+        .filters-scroller::before,
+        .filters-scroller::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 3.5rem;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+        .filters-scroller::before { left: 0;  background: linear-gradient(to right, #fff 35%, rgba(255, 255, 255, 0)); }
+        .filters-scroller::after  { right: 0; background: linear-gradient(to left,  #fff 35%, rgba(255, 255, 255, 0)); }
+        .filters-scroller.fade-left::before,
+        .filters-scroller.fade-right::after { opacity: 1; }
+    }
+
+    .tax-info { display: none; }
+
+    .tax-toggle {
+        flex: 0 0 auto;
+        border: 1px solid #222;
+        border-radius: 1rem;
+        height: 3rem;
+        padding: 0 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    @media (max-width: 767.98px) {
+        .filters-arrow { display: none !important; }   /* mobile par swipe hota hai */
+        .filters-scroller { flex-basis: 100%; }        /* chips poori width, toggle neeche */
+        .tax-toggle { height: 2.6rem; }
+    }
 </style>
 
-<div id="filters">
-<!-- <div class="filter">
-   <div> <i class="fa-solid fa-fire"></i></div>
-    <p>Trending</p>
-</div> -->
+<div id="filters-wrap">
+    <div class="filters-scroller">
+        <button type="button" class="filters-arrow filters-arrow-prev" id="filters-prev" aria-label="Scroll categories left" hidden>
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
 
-<a href="/listings" class="filter <%= !activeCategory ? 'active' : '' %>">
-  <div><i class="fa-solid fa-border-all"></i></div>
-  <p>All</p>
-</a>
-<% for (let c of categories) { %>
-  <a href="/listings?category=<%= c.key %>" class="filter <%= activeCategory === c.key ? 'active' : '' %>">
-    <div><i class="<%= c.icon %>"></i></div>
-    <p><%= c.label %></p>
-  </a>
-<% } %>
-<div class="tax-toggle ">
-  <div class="form-check-reverse form-switch">
-  <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
-  <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
+        <div id="filters">
+            <a href="/listings" class="filter <%= !activeCategory ? 'active' : '' %>">
+                <i class="fa-solid fa-border-all"></i>
+                <p>All</p>
+            </a>
+
+            <% for (let c of categories) { %>
+                <a href="/listings?category=<%= c.key %>" class="filter <%= activeCategory === c.key ? 'active' : '' %>">
+                    <i class="<%= c.icon %>"></i>
+                    <p><%= c.label %></p>
+                </a>
+            <% } %>
+        </div>
+
+        <button type="button" class="filters-arrow filters-arrow-next" id="filters-next" aria-label="Scroll categories right">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <div class="tax-toggle">
+        <div class="form-check-reverse form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+            <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
+        </div>
+    </div>
 </div>
-</div>
-</div>
+
 <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
     <% for (let listing of allListings) { %>
         <a href="/listings/<%= listing._id %>" class="listing-link">
@@ -92,8 +169,8 @@ a.filter {
     <% } %>
 </div>
 
- <% if (allListings.length === 0) { %>
-  <p class="mt-4 text-muted">Is category me abhi koi listing nahi hai.</p>
+<% if (allListings.length === 0) { %>
+    <p class="mt-4 text-muted">Is category me abhi koi listing nahi hai.</p>
 <% } %>
 
 <script>
@@ -109,6 +186,35 @@ a.filter {
             }
         }
     });
+    // ---- category bar: arrows + active chip ko beech me laana ----
+    (function () {
+        const bar  = document.getElementById("filters");
+        const prev = document.getElementById("filters-prev");
+        const next = document.getElementById("filters-next");
+        const smooth = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
 
-   
+        const scroller = bar.parentElement;
+
+        function updateArrows() {
+            prev.hidden = bar.scrollLeft <= 2;
+            next.hidden = bar.scrollLeft >= bar.scrollWidth - bar.clientWidth - 2;
+            scroller.classList.toggle("fade-left", !prev.hidden);
+            scroller.classList.toggle("fade-right", !next.hidden);
+        }
+
+        function centerActive() {
+            const active = bar.querySelector(".filter.active");
+            if (active) {
+                bar.scrollLeft = active.offsetLeft - (bar.clientWidth - active.offsetWidth) / 2;
+            }
+            updateArrows();
+        }
+
+        prev.addEventListener("click", () => bar.scrollBy({ left: -bar.clientWidth * 0.7, behavior: smooth }));
+        next.addEventListener("click", () => bar.scrollBy({ left:  bar.clientWidth * 0.7, behavior: smooth }));
+        bar.addEventListener("scroll", updateArrows, { passive: true });
+        window.addEventListener("resize", updateArrows);
+        window.addEventListener("load", centerActive);   // fonts/icons load hone ke baad dobara
+        centerActive();
+    })();
 </script>
