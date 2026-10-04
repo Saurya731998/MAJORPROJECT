@@ -1,59 +1,108 @@
-<style>
-  .search-btn{
-    background-color: #fe424d;
-    color:#fff; 
-    border-radius:25px;
-    padding: 0 1rem 0 1rem;
-  }
+<nav class="navbar navbar-expand-lg wander-navbar sticky-top">
+    <div class="container-fluid px-lg-5">
 
-   .search-btn:hover{
-    background-color: #fe424d;
-    color:#fff; 
-  }
+        <!-- LOGO -->
+        <a class="navbar-brand wander-logo" href="/listings">
+            <span class="logo-icon">
+                <i class="fa-solid fa-compass"></i>
+            </span>
+            <span>WanderLust</span>
+        </a>
 
-  .search-btn i {
-    display:inline;
-    margin-right:0.5rem;
-  }
+        <!-- MOBILE BUTTON -->
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
 
-  .search-inp{
-    border-radius: 25px;
-    padding: 0.5rem 3rem 0.5rem 3rem;
-    font-size: 1rem;
-  }
+            <i class="fa-solid fa-bars"></i>
+        </button>
 
-</style>
+        <div class="collapse navbar-collapse" id="mainNavbar">
 
-<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
-    <button 
-    class="navbar-toggler" 
-    type="button" 
-    data-bs-toggle="collapse"
-    data-bs-target="#navbarNavAltMarkup"
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-link" href="/listings">Explore</a>
-       </div>
-       <div class="navbar-nav ms-auto">
-        <form class="d-flex" role="search">
-      <input class="form-control me-2 search-inp"  type="search" placeholder="Search destinations"/>
-      <button class="btn search-btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Search</button>
-    </form>
-       </div>
-      <div class="navbar-nav ms-auto">
-         <a class="nav-link" href="/listings/new">Air bnb your home</a>
-       <% if(!currUser) { %>
-           <a class="nav-link"  href="/signup"><b>Sign up</b></a>
-           <a class="nav-link" href="/login"><b>Log in</b></a>
-      <% } %>
-       <% if(currUser) { %>
-        <a class="nav-link" href="/logout"><b>Logout</b></a>
-        <% } %>
-      </div>
+            <!-- LEFT MENU -->
+            <ul class="navbar-nav ms-lg-4 mb-2 mb-lg-0">
+
+                <li class="nav-item">
+                    <a class="nav-link wander-nav-link" href="/listings">
+                        <i class="fa-solid fa-compass me-1"></i>
+                        Explore
+                    </a>
+                </li>
+
+            </ul>
+
+            <!-- CENTER SEARCH -->
+            <form
+                class="wander-search mx-lg-auto"
+                action="/listings"
+                method="GET">
+
+                <div class="search-icon">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+
+                <input
+                    type="text"
+                    name="q"
+                    placeholder="Search destinations..."
+                    autocomplete="off">
+
+                <button type="submit">
+                    Search
+                </button>
+
+            </form>
+
+            <!-- RIGHT MENU -->
+            <ul class="navbar-nav ms-lg-auto align-items-lg-center">
+
+                <li class="nav-item">
+                    <a class="nav-link host-link" href="/listings/new">
+                        <i class="fa-solid fa-house me-1"></i>
+                        Airbnb your home
+                    </a>
+                </li>
+
+                <% if(!currUser) { %>
+
+                    <li class="nav-item">
+                        <a class="nav-link auth-link" href="/signup">
+                            Sign up
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="login-btn" href="/login">
+                            Log in
+                        </a>
+                    </li>
+
+                <% } %>
+
+                <% if(currUser) { %>
+
+                    <li class="nav-item">
+                        <span class="user-welcome">
+                            <i class="fa-solid fa-circle-user"></i>
+                            <%= currUser.username %>
+                        </span>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="logout-btn" href="/logout">
+                            Logout
+                        </a>
+                    </li>
+
+                <% } %>
+
+            </ul>
+
+        </div>
     </div>
-  </div>
 </nav>

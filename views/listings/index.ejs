@@ -1,220 +1,462 @@
 <% layout("/layouts/boilerplate") %>
 
-<style>
-    #filters-wrap {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-top: 1.5rem;
-    }
+<!-- ================= HERO SECTION ================= -->
 
-    /* chips ka scroll area. Arrows isi ke upar float karte hain, isliye width kabhi nahi badalti */
-    .filters-scroller {
-        position: relative;
-        flex: 1 1 0;
-        min-width: 0;            /* bina iske row bahar faile jati hai */
-    }
+<section class="wander-hero">
 
-    #filters {
-        position: relative;      /* JS ke offsetLeft ke liye zaroori */
-        display: flex;
-        overflow-x: auto;
-        scrollbar-width: none;   /* Firefox */
-    }
-    #filters::-webkit-scrollbar { display: none; }   /* Chrome / Safari */
+    <div class="hero-overlay"></div>
 
-    .filter {
-        flex: 0 0 auto;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.3rem;
-        padding: 0.5rem 0.9rem 0.45rem;
-        color: inherit;
-        text-decoration: none;
-        opacity: 0.6;
-        border-bottom: 2px solid transparent;
-        transition: opacity 0.15s ease, border-color 0.15s ease;
-    }
-    .filter i { font-size: 1.25rem; }
-    .filter p { margin: 0; font-size: 0.8rem; white-space: nowrap; }
-    .filter:hover { opacity: 1; color: inherit; border-bottom-color: #ddd; }
-    .filter.active { opacity: 1; border-bottom-color: #222; }
+    <div class="hero-content">
 
-    /* keyboard se Tab karne par focus dikhe */
-    .filter:focus-visible,
-    .filters-arrow:focus-visible {
-        outline: 2px solid #222;
-        outline-offset: -2px;
-    }
+        <span class="hero-badge">
+            <i class="fa-solid fa-location-dot"></i>
+            Explore the world
+        </span>
 
-    @media (prefers-reduced-motion: reduce) {
-        .filter,
-        .filters-scroller::before,
-        .filters-scroller::after { transition: none; }
-    }
+        <h1>
+            Find your next
+            <span>adventure.</span>
+        </h1>
 
-    /* left / right arrows (sirf desktop par) */
-    .filters-arrow {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 2;
-        width: 2rem;
-        height: 2rem;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid #ccc;
-        border-radius: 50%;
-        background: #fff;
-        color: #222;
-        font-size: 0.75rem;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
-    }
-    .filters-arrow-prev { left: 0; }
-    .filters-arrow-next { right: 0; }
-    .filters-arrow:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
-    .filters-arrow[hidden] { display: none; }
+        <p>
+            Discover beautiful stays, unique places and unforgettable
+            experiences around the world.
+        </p>
 
-    /* kinaare par halka fade, taaki aadhi kati chip na dikhe (sirf desktop par) */
-    @media (min-width: 768px) {
-        .filters-scroller::before,
-        .filters-scroller::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 3.5rem;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0;
-            transition: opacity 0.15s ease;
-        }
-        .filters-scroller::before { left: 0;  background: linear-gradient(to right, #fff 35%, rgba(255, 255, 255, 0)); }
-        .filters-scroller::after  { right: 0; background: linear-gradient(to left,  #fff 35%, rgba(255, 255, 255, 0)); }
-        .filters-scroller.fade-left::before,
-        .filters-scroller.fade-right::after { opacity: 1; }
-    }
+        <a href="#exploreListings" class="hero-btn">
+            Explore stays
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
 
-    .tax-info { display: none; }
+    </div>
 
-    .tax-toggle {
-        flex: 0 0 auto;
-        border: 1px solid #222;
-        border-radius: 1rem;
-        height: 3rem;
-        padding: 0 1rem;
-        display: flex;
-        align-items: center;
-    }
+</section>
 
-    @media (max-width: 767.98px) {
-        .filters-arrow { display: none !important; }   /* mobile par swipe hota hai */
-        .filters-scroller { flex-basis: 100%; }        /* chips poori width, toggle neeche */
-        .tax-toggle { height: 2.6rem; }
-    }
-</style>
 
-<div id="filters-wrap">
-    <div class="filters-scroller">
-        <button type="button" class="filters-arrow filters-arrow-prev" id="filters-prev" aria-label="Scroll categories left" hidden>
+<!-- ================= CATEGORY FILTER ================= -->
+
+<section class="category-section">
+
+    <div class="category-header">
+
+        <div>
+            <span class="section-small-title">
+                DISCOVER
+            </span>
+
+            <h2>
+                Explore by category
+            </h2>
+        </div>
+
+        <div class="tax-toggle modern-tax-toggle">
+
+            <div class="form-check form-switch">
+
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="switchCheckDefault">
+
+                <label
+                    class="form-check-label"
+                    for="switchCheckDefault">
+
+                    Display total after taxes
+
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="category-wrapper">
+
+        <button
+            type="button"
+            class="category-arrow"
+            id="filters-prev"
+            aria-label="Previous categories">
+
             <i class="fa-solid fa-chevron-left"></i>
+
         </button>
+
 
         <div id="filters">
-            <a href="/listings" class="filter <%= !activeCategory ? 'active' : '' %>">
-                <i class="fa-solid fa-border-all"></i>
-                <p>All</p>
+
+            <!-- ALL -->
+
+            <a
+                href="/listings"
+                class="category-item <%= !activeCategory ? 'active' : '' %>">
+
+                <div class="category-icon">
+                    <i class="fa-solid fa-border-all"></i>
+                </div>
+
+                <span>All</span>
+
             </a>
 
+
+            <!-- DYNAMIC CATEGORIES -->
+
             <% for (let c of categories) { %>
-                <a href="/listings?category=<%= c.key %>" class="filter <%= activeCategory === c.key ? 'active' : '' %>">
-                    <i class="<%= c.icon %>"></i>
-                    <p><%= c.label %></p>
+
+                <a
+                    href="/listings?category=<%= c.key %>"
+                    class="category-item <%= activeCategory === c.key ? 'active' : '' %>">
+
+                    <div class="category-icon">
+
+                        <i class="<%= c.icon %>"></i>
+
+                    </div>
+
+                    <span>
+                        <%= c.label %>
+                    </span>
+
                 </a>
+
             <% } %>
+
         </div>
 
-        <button type="button" class="filters-arrow filters-arrow-next" id="filters-next" aria-label="Scroll categories right">
+
+        <button
+            type="button"
+            class="category-arrow"
+            id="filters-next"
+            aria-label="Next categories">
+
             <i class="fa-solid fa-chevron-right"></i>
+
         </button>
+
     </div>
 
-    <div class="tax-toggle">
-        <div class="form-check-reverse form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
-            <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
+</section>
+
+
+
+<!-- ================= LISTINGS ================= -->
+
+<section
+    class="listings-section"
+    id="exploreListings">
+
+    <div class="listings-heading">
+
+        <div>
+
+            <span class="section-small-title">
+                WANDERLUST COLLECTION
+            </span>
+
+            <h2>
+                Popular stays
+            </h2>
+
         </div>
+
+        <span class="listing-count">
+            <%= allListings.length %> places
+        </span>
+
     </div>
-</div>
 
-<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
-    <% for (let listing of allListings) { %>
-        <a href="/listings/<%= listing._id %>" class="listing-link">
-            <div class="card col listing-card">
-                <img src="<%= listing.image.url %>" class="card-img-top" alt="listing_image" style="height:20rem" />
-                <div class="card-img-overlay"></div>
-                <div class="card-body">
-                    <p class="card-text"> 
-                        <b><%= listing.title %></b> <br>
-                        &#8377;<%= listing.price.toLocaleString("en-IN") %> / night
-                        <i class="tax-info">&nbsp; &nbsp;+18% GST</i>
-                    </p>
-                </div>
+
+    <% if (allListings.length > 0) { %>
+
+        <div class="listing-grid">
+
+            <% for (let listing of allListings) { %>
+
+                <a
+                    href="/listings/<%= listing._id %>"
+                    class="listing-link">
+
+                    <article class="modern-listing-card">
+
+                        <!-- IMAGE -->
+
+                        <div class="listing-image-wrapper">
+
+                            <img
+                                src="<%= listing.image.url %>"
+                                alt="<%= listing.title %>"
+                                class="listing-image">
+
+                            <div class="image-gradient"></div>
+
+                            <span class="guest-favorite">
+                                <i class="fa-solid fa-heart"></i>
+                            </span>
+
+                            <span class="view-details">
+                                View details
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </span>
+
+                        </div>
+
+
+                        <!-- CONTENT -->
+
+                        <div class="modern-card-content">
+
+                            <div class="listing-title-row">
+
+                                <h3>
+                                    <%= listing.title %>
+                                </h3>
+
+                                <span class="listing-rating">
+                                    <i class="fa-solid fa-star"></i>
+                                    4.8
+                                </span>
+
+                            </div>
+
+
+                            <p class="listing-location">
+
+                                <i class="fa-solid fa-location-dot"></i>
+
+                                <%= listing.location %>
+                                <% if(listing.country) { %>
+                                    , <%= listing.country %>
+                                <% } %>
+
+                            </p>
+
+
+                            <div class="listing-price">
+
+                                <strong>
+                                    ₹<%= listing.price.toLocaleString("en-IN") %>
+                                </strong>
+
+                                <span>
+                                    / night
+                                </span>
+
+                                <span class="tax-info">
+                                    +18% GST
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                </a>
+
+            <% } %>
+
+        </div>
+
+    <% } else { %>
+
+        <!-- EMPTY STATE -->
+
+        <div class="empty-listings">
+
+            <div class="empty-icon">
+                <i class="fa-solid fa-map-location-dot"></i>
             </div>
-        </a>
-    <% } %>
-</div>
 
-<% if (allListings.length === 0) { %>
-    <p class="mt-4 text-muted">Is category me abhi koi listing nahi hai.</p>
-<% } %>
+            <h3>
+                No stays found
+            </h3>
+
+            <p>
+                There are no listings in this category right now.
+            </p>
+
+            <a href="/listings" class="empty-btn">
+                View all stays
+            </a>
+
+        </div>
+
+    <% } %>
+
+</section>
+
+
+
+<!-- ================= WHY WANDERLUST ================= -->
+
+<section class="why-section">
+
+    <div class="why-heading">
+
+        <span class="section-small-title">
+            WHY WANDERLUST
+        </span>
+
+        <h2>
+            Travel better. Explore more.
+        </h2>
+
+    </div>
+
+
+    <div class="why-grid">
+
+        <div class="why-card">
+
+            <div class="why-icon">
+                <i class="fa-solid fa-earth-americas"></i>
+            </div>
+
+            <h3>
+                Amazing destinations
+            </h3>
+
+            <p>
+                Discover beautiful places and unique stays
+                from different parts of the world.
+            </p>
+
+        </div>
+
+
+        <div class="why-card">
+
+            <div class="why-icon">
+                <i class="fa-solid fa-shield-heart"></i>
+            </div>
+
+            <h3>
+                Trusted stays
+            </h3>
+
+            <p>
+                Find comfortable properties designed to make
+                your journey memorable.
+            </p>
+
+        </div>
+
+
+        <div class="why-card">
+
+            <div class="why-icon">
+                <i class="fa-solid fa-route"></i>
+            </div>
+
+            <h3>
+                Travel your way
+            </h3>
+
+            <p>
+                Choose the perfect stay for your next adventure
+                and create your own experience.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= TAX + CATEGORY JS ================= -->
 
 <script>
-    let taxSwitch = document.getElementById("switchCheckDefault");
-    taxSwitch.addEventListener("click" , () =>{
-        let taxInfo = document.getElementsByClassName("tax-info");
-        for(info of taxInfo){
-            if(info.style.display != "inline"){
 
-                info.style.display = "inline";
-            } else{
-                info.style.display = "none";
-            }
-        }
+    /* TAX TOGGLE */
+
+    const taxSwitch =
+        document.getElementById("switchCheckDefault");
+
+    if (taxSwitch) {
+
+        taxSwitch.addEventListener("change", function () {
+
+            const taxInfo =
+                document.querySelectorAll(".tax-info");
+
+            taxInfo.forEach(function(info) {
+
+                info.classList.toggle(
+                    "show-tax",
+                    taxSwitch.checked
+                );
+
+            });
+
+        });
+
+    }
+
+
+
+    /* CATEGORY SCROLL */
+
+    const filters =
+        document.getElementById("filters");
+
+    const previousButton =
+        document.getElementById("filters-prev");
+
+    const nextButton =
+        document.getElementById("filters-next");
+
+
+    if (filters && previousButton && nextButton) {
+
+        previousButton.addEventListener("click", function () {
+
+            filters.scrollBy({
+                left: -350,
+                behavior: "smooth"
+            });
+
+        });
+
+
+        nextButton.addEventListener("click", function () {
+
+            filters.scrollBy({
+                left: 350,
+                behavior: "smooth"
+            });
+
+        });
+
+    }
+
+
+
+    /* SCROLL TO LISTINGS */
+
+    document.querySelectorAll(
+        'a[href="#exploreListings"]'
+    ).forEach(function(link) {
+
+        link.addEventListener("click", function(e) {
+
+            e.preventDefault();
+
+            document
+                .getElementById("exploreListings")
+                .scrollIntoView({
+                    behavior: "smooth"
+                });
+
+        });
+
     });
-    // ---- category bar: arrows + active chip ko beech me laana ----
-    (function () {
-        const bar  = document.getElementById("filters");
-        const prev = document.getElementById("filters-prev");
-        const next = document.getElementById("filters-next");
-        const smooth = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
 
-        const scroller = bar.parentElement;
-
-        function updateArrows() {
-            prev.hidden = bar.scrollLeft <= 2;
-            next.hidden = bar.scrollLeft >= bar.scrollWidth - bar.clientWidth - 2;
-            scroller.classList.toggle("fade-left", !prev.hidden);
-            scroller.classList.toggle("fade-right", !next.hidden);
-        }
-
-        function centerActive() {
-            const active = bar.querySelector(".filter.active");
-            if (active) {
-                bar.scrollLeft = active.offsetLeft - (bar.clientWidth - active.offsetWidth) / 2;
-            }
-            updateArrows();
-        }
-
-        prev.addEventListener("click", () => bar.scrollBy({ left: -bar.clientWidth * 0.7, behavior: smooth }));
-        next.addEventListener("click", () => bar.scrollBy({ left:  bar.clientWidth * 0.7, behavior: smooth }));
-        bar.addEventListener("scroll", updateArrows, { passive: true });
-        window.addEventListener("resize", updateArrows);
-        window.addEventListener("load", centerActive);   // fonts/icons load hone ke baad dobara
-        centerActive();
-    })();
 </script>
