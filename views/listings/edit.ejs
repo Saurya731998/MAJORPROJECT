@@ -42,7 +42,18 @@
            <input name="listing[location]" value="<%= listing.location %>" type="text" class="form-control" required>
            <div class="invalid-feedback">Location should be valid</div>
        </div>
-       
+
+       <div class="mb-3">
+  <label for="category" class="form-label">Category</label>
+  <select name="listing[category]" id="category" class="form-select" required>
+    <option value="" disabled <%= !listing.category ? "selected" : "" %>>Choose a category</option>
+    <% for (let c of categories) { %>
+      <option value="<%= c.key %>" <%= listing.category === c.key ? "selected" : "" %>><%= c.label %></option>
+    <% } %>
+  </select>
+  <div class="invalid-feedback">Please select a category</div>
+</div>
+
        <button class="btn btn-dark edit-btn mt-3 mb-5">Edit</button>
     </form>
   </div>

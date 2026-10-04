@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Review = require("./review.js");
+const { CATEGORY_KEYS } = require("../utils/categories.js");
 
 const listingSchema = new Schema({
   title: {
@@ -18,6 +19,12 @@ const listingSchema = new Schema({
     price: Number,
     location: String,
     country: String,
+
+  category: { 
+     type: String,
+     enum: CATEGORY_KEYS, 
+    },
+
     reviews: [
       {
         type : Schema.Types.ObjectId,

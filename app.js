@@ -20,6 +20,7 @@ dns.setServers(["8.8.8.8", "1.1.1.1"]);
  const passport = require("passport");
  const LocalStrategy = require("passport-local");
  const User = require("./models/user.js");
+ const{CATEGORIES} = require("./utils/categories.js");
  
 
  const listingRouter = require("./routes/listing.js");
@@ -86,6 +87,7 @@ app.use((req,res,next) =>{
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.currUser = req.user;
+    res.locals.categories = CATEGORIES;
     next();
 });
 
